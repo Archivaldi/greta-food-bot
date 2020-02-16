@@ -22,7 +22,15 @@ namespace GretaFoodCore.Api
     public class Startup
     {
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
+            
             services.AddRouting();
             
             services.AddControllers()
@@ -33,8 +41,6 @@ namespace GretaFoodCore.Api
 
             ConfigureSwagger(services);
             
-            services.AddCors();
-
             services.AddDbContext<GretaFoodDbContext>((serviceProvider, optionsBuilder) =>
                 optionsBuilder.UseMySql(
                     serviceProvider.GetRequiredService<CommandLineArguments>().MySqlConnectionString));
@@ -53,12 +59,8 @@ namespace GretaFoodCore.Api
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());   
-            
+            app.UseCors("CorsPolicy");
+
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
