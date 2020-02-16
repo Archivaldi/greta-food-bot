@@ -1,8 +1,9 @@
 import React from 'react';
 const SavedRest = (props) => {
     return (
-        <div>
+            <div>
                 <div className="col s12 m7">
+                    <input type="text" value={props.id} style={{display:"none"}} />
                     <h2 style={{ marginTop: 25 }} className="header">{props.name}</h2>
                     <div className="card horizontal">
                         <div className="card-stacked">

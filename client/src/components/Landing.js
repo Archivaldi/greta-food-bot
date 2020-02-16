@@ -49,6 +49,7 @@ class Landing extends React.Component {
     })
   }
 
+
   saveRest = (id) => {
       let rest_info = {};
       for (let i = 0; i < this.state.restaurants.results.length; i++) {
