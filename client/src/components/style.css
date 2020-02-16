@@ -14,3 +14,10 @@ footer {
     width: 65%;
     text-align: center;
 }
+
+.successSign {
+    height: 3rem;
+    width: 100%;
+    background-color: rgb(79, 206, 163);
+    text-transform: uppercase;
+}

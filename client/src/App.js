@@ -1,38 +1,25 @@
 import React from 'react';
-import "./components/style.css"
+import { Route, BrowserRouter } from "react-router-dom";
+
 import Header from './components/Header';
-import SearchRest from './components/SearchRest';
-import Footer from "./components/Footer";
-import AddFoodForm from "./components/AddFoodForm";
+import Landing from "./components/Landing";
+import SavedRest from "./components/SavedRest";
+import Footer from "./components/Footer"
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      restorants: [],
-      id: ""
-    };
-  }
+const App = () =>
+  (
 
-  render() {
-    if (this.state.restorants.length === 0 && this.state.id === "") {
-      return (
+    <div>
+      <BrowserRouter>
         <div className="container">
           <Header />
-          <SearchRest />
+          <Route exact path="/" component={Landing} />
+          <Route exact path="/savedRestaurants" component={SavedRest} />
           <Footer />
         </div>
-      )
-    } else {
-      return (
-        <div className="container">
-          <Header />
-          <AddFoodForm />
-          <Footer />
-        </div>
-      )
-    }
-  }
-}
+      </BrowserRouter>
+    </div>
+  )
 
-export default App;
+
+export default App

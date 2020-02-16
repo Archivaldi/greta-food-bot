@@ -1,11 +1,9 @@
 import React from "react";
-const SearchRest = () => {
+const SearchRest = (props) => {
     return (
         <div>
-            <form action="/mapsAPI" method="POST">
-                <input type="text" placeholder="Search for a restaurant" name="restName"/>
-                <button>Submit</button>
-            </form>
+                <input type="text" placeholder="Search for a restaurant" id="restName" name="restName"/>
+                <button onClick={props.takeRest}>Submit</button>
         </div>
     )
 }
