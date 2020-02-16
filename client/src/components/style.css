@@ -1,0 +1,27 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 65%;
+    text-align: center;
+}
+
+.successSign {
+    height: 3rem;
+    width: 100%;
+    background-color: rgb(79, 206, 163);
+    text-transform: uppercase;
+}
+
+nav {
+    background-color: rgb(47, 121, 218);
+}
