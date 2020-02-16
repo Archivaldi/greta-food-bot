@@ -19,6 +19,30 @@ namespace GretaFoodCore.Api.Controllers
             _gretaFoodDb = gretaFoodDb;
         }
 
+        [HttpGet("{restaurantId}")]
+        public object GetAllRestaurantFood(string restaurantId)
+        {
+            var restFood = _gretaFoodDb
+                .Foods
+                .Where(f => f.RestaurantId.Equals(restaurantId, StringComparison.OrdinalIgnoreCase));
+            
+            var result =   
+                restFood
+                .Select(f => new {
+                    id = f.Id,
+                    name = f.Name,
+                    geo = f.Restaurant.GeoTag,
+                    restaurantName = f.Restaurant.Name,
+                    restaurantAddress = f.Restaurant.Address,
+                    karmaScore = f.Restaurant.KarmaScore,
+                    availableTime = f.AvailableTime,
+                    imageUrl = f.ImageUrl,
+                    restrauntId = f.RestaurantId
+                })
+                .ToList();
+            
+            return result;
+        }
         
         [HttpGet()]
         public object GetAllFood()
@@ -29,6 +53,8 @@ namespace GretaFoodCore.Api.Controllers
                     name = f.Name,
                     geo = f.Restaurant.GeoTag,
                     restaurantName = f.Restaurant.Name,
+                    restaurantAddress = f.Restaurant.Address,
+                    karmaScore = f.Restaurant.KarmaScore,
                     availableTime = f.AvailableTime,
                     imageUrl = f.ImageUrl,
                     restrauntId = f.RestaurantId
