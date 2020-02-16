@@ -22,7 +22,17 @@ namespace GretaFoodCore.Api.Controllers
         [HttpGet()]
         public List<RestaurantEntity> GetAllRestaurants()
         {
-            return  _gretaFoodDb.Restaurants.ToList();
+            return  _gretaFoodDb.Restaurants.Include(r => r.FoodEntities)
+                .Select(r => new RestaurantEntity
+                {
+                    Address = r.Address,
+                    Id = r.Id,
+                    Name =  r.Name,
+                    GeoTag = r.GeoTag,
+                    AlgorandAddress = r.AlgorandAddress,
+                    KarmaScore = r.KarmaScore,
+                    FoodEntities = new List<FoodEntity>(r.FoodEntities)
+                }).ToList();
         }
         
         [HttpPost()]
