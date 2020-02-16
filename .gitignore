@@ -1,0 +1,12 @@
+core-api-service/GretaFoodCore/.idea/.gitignore
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/riderModule.iml
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/.idea/.gitignore
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/.idea/indexLayout.xml
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/.idea/modules.xml
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/.idea/projectSettingsUpdater.xml
+core-api-service/GretaFoodCore/.idea/.idea.GretaFoodCore/.idea/vcs.xml
+core-api-service/GretaFoodCore/obj/project.packagespec.json
+core-api-service/GretaFoodCore/obj/Debug/netcoreapp3.1/GretaFoodCore.Api.AssemblyInfo.cs
+core-api-service/GretaFoodCore/obj/Debug/netcoreapp3.1/GretaFoodCore.Api.AssemblyInfoInputs.cache
+core-api-service/GretaFoodCore/obj/Debug/netcoreapp3.1/GretaFoodCore.Api.csprojAssemblyReference.cache
+core-api-service/GretaFoodCore/Properties/launchSettings.json
