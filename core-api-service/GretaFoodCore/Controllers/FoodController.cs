@@ -50,5 +50,20 @@ namespace GretaFoodCore.Api.Controllers
             
             return foodEntity;
         }
+        
+        [HttpPost("{foodEntityId}")]
+        public async Task DeleteFoodEntry(string foodEntityId)
+        {
+            var foodToDelete = _gretaFoodDb.Foods
+                .FirstOrDefault(f => f.Id.Equals(foodEntityId));
+
+            if (foodToDelete == null)
+            {
+                throw new  ApplicationException("Unable to find food to delete");
+            }
+
+            _gretaFoodDb.Foods.Remove(foodToDelete);
+            await _gretaFoodDb.SaveChangesAsync();
+        }
     }
 }
