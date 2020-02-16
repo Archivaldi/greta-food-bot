@@ -14,6 +14,9 @@ namespace GretaFoodCore.Api.DAL
         [Column("AvailableTime")] [Required] 
         public string AvailableTime { get; set; }
         
+        [Column("ImageUrl")] 
+        public string ImageUrl { get; set; }
+        
         [ForeignKey("Restaurant")]
         public string RestaurantId { get; set; }
         public RestaurantEntity Restaurant { get; set; }
