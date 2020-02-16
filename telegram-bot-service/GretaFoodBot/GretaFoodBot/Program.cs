@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using RestSharp.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -18,10 +19,14 @@ namespace GretaFoodBot
     public static class Program
     {
         private static TelegramBotClient Bot;
+        private static readonly AutoResetEvent _appShutDownWaitHandle = new AutoResetEvent(false);
 
-        public static async Task Main()
+        public static async Task Main(string[] args)
         {
-            Bot = new TelegramBotClient("1003573538:AAGVxLjzHYm355i_cXbX1HqwX27o2_CEcPQ");
+            var telegramToken = args[0];
+            Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+
+            Bot = new TelegramBotClient(telegramToken);
             var me = await Bot.GetMeAsync();
             Console.Title = me.Username;
 
@@ -37,7 +42,13 @@ namespace GretaFoodBot
             Console.ReadLine();
 
             // Send cancellation request to stop bot
-            cts.Cancel();
+            _appShutDownWaitHandle.WaitOne();
+        }
+        
+        private static void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            Console.WriteLine("Application is shutting down...");
+            _appShutDownWaitHandle.Set();
         }
 
         public static async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
@@ -73,7 +84,38 @@ namespace GretaFoodBot
             Console.WriteLine($"Recevie message type: {message.Type}");
             if (message.Type == MessageType.Location)
             {
-                Console.WriteLine(message.Location);
+                var userGeo = $"{message.Location.Latitude},{message.Location.Longitude}"; 
+                var closestFood = (await  new FoodService().FindClosestFoodAsync(userGeo))
+                                    .OrderBy(f => f.DistanceInMeters)
+                                    .ToList();
+                
+                await Bot.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    parseMode: ParseMode.Markdown,
+                    text: $"I found *{closestFood.Count}* meals 🍲 for you nearby..."
+                    //replyMarkup: new ReplyKeyboardRemove()
+                );
+                foreach (var food in closestFood)
+                {
+
+                    await Bot.SendPhotoAsync(chatId: message.Chat.Id,photo:food.Food.ImageUrl);
+                    await Bot.SendTextMessageAsync(
+                        chatId: message.Chat.Id,
+                        parseMode: ParseMode.Markdown,
+                        text: 
+                              $"*{food.Food.Name}* from *{food.Food.RestaurantName}* is in *{food.DistanceInMeters}* meters from you.\n" +
+                              $"It will take only {food.ArivalTime.Subtract(DateTime.Now).Minutes} minutes ⏱ for you to get there.\n" +
+                              $"Go grab your free food 🥙 😀",
+                        replyMarkup: new InlineKeyboardMarkup(new[]
+                        {
+                            new []
+                            {
+                                InlineKeyboardButton.WithCallbackData("Grab this food", food.Food.Geo),
+                            },
+                        })
+                    );
+                }
+                return;
             }
             if (message.Type != MessageType.Text)
                 return;
@@ -81,84 +123,27 @@ namespace GretaFoodBot
             switch (message.Text.Split(' ').First())
             {
                 // send inline keyboard
-                case "/inline":
+                case "/start":
                     await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
 
-                    // simulate longer running task
-                    await Task.Delay(500);
-
-                    var inlineKeyboard = new InlineKeyboardMarkup(new[]
-                    {
-                        // first row
-                        new []
-                        {
-                            InlineKeyboardButton.WithCallbackData("1.1", "11"),
-                            InlineKeyboardButton.WithCallbackData("1.2", "12"),
-                        },
-                        // second row
-                        new []
-                        {
-                            InlineKeyboardButton.WithCallbackData("2.1", "21"),
-                            InlineKeyboardButton.WithCallbackData("2.2", "22"),
-                        }
-                    });
+                    var startReplyKeyboard = new ReplyKeyboardMarkup(
+                        new[] {
+                            new[]{
+                                KeyboardButton.WithRequestLocation("Find some free food nearby !"),
+                            },
+                        });
+                    
                     await Bot.SendTextMessageAsync(
                         chatId: message.Chat.Id,
-                        text: "Choose",
-                        replyMarkup: inlineKeyboard
+                        text: "Hi, I'm Greta Food Bot, and I will find some free food for you. Please, send me your location for next steps",
+                        replyMarkup: startReplyKeyboard
                     );
                     break;
-
-                // send custom keyboard
-                case "/keyboard":
-                    ReplyKeyboardMarkup ReplyKeyboard = new[]
-                    {
-                        new[] { "1.1", "1.2" },
-                        new[] { "2.1", "2.2" },
-                    };
-                    await Bot.SendTextMessageAsync(
-                        chatId: message.Chat.Id,
-                        text: "Choose",
-                        replyMarkup: ReplyKeyboard
-                    );
-                    break;
-
-                // send a photo
-                case "/photo":
-                    await Bot.SendChatActionAsync(message.Chat.Id, ChatAction.UploadPhoto);
-
-                    const string file = @"Files/tux.png";
-                    using (var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        var fileName = file.Split(Path.DirectorySeparatorChar).Last();
-                        await Bot.SendPhotoAsync(
-                            chatId: message.Chat.Id,
-                            photo: new InputOnlineFile(fileStream, fileName),
-                            caption: "Nice Picture"
-                        );
-                    }
-                    break;
-
-                // request location or contact
-                case "/request":
-                    var RequestReplyKeyboard = new ReplyKeyboardMarkup(new[]
-                    {
-                        KeyboardButton.WithRequestLocation("Location"),
-                        KeyboardButton.WithRequestContact("Contact"),
-                    });
-                    await Bot.SendTextMessageAsync(
-                        message.Chat.Id,
-                        "Who or Where are you?",
-                        replyMarkup: RequestReplyKeyboard
-                    );
-                    break;
-
+                
                 default:
                     const string usage = "Usage:\n" +
-                        "/inline   - send inline keyboard\n" +
-                        "/keyboard - send custom keyboard\n" +
-                        "/photo    - send a photo\n" +
-                        "/request  - request location or contact";
+                                         "/start  - start conversation with saint Greta\n" +
+                                         "/search - find some food fo you\n";
                     await Bot.SendTextMessageAsync(
                         chatId: message.Chat.Id,
                         text: usage,
@@ -172,13 +157,18 @@ namespace GretaFoodBot
         {
             await Bot.AnswerCallbackQueryAsync(
                 callbackQuery.Id,
-                $"Received {callbackQuery.Data}"
+                $"Congrats!"
             );
-
-            await Bot.SendTextMessageAsync(
-                callbackQuery.Message.Chat.Id,
-                $"Received {callbackQuery.Data}"
-            );
+            var lo = float.Parse(callbackQuery.Data.Split(',')[0]);
+            var ln = float.Parse(callbackQuery.Data.Split(',')[1]);
+            await Bot.SendLocationAsync(
+                callbackQuery.Message.Chat.Id, lo, ln);
+            
+            await Bot.EditMessageTextAsync(
+                callbackQuery.Message.Chat.Id, 
+                callbackQuery.Message.MessageId, 
+                $"Your free promocode to get the food is: *DeveloperWeek2020*. Go ahead and tell at the end location ! 🥙 😀",
+                parseMode: ParseMode.Markdown);
         }
 
         private static async Task BotOnInlineQueryReceived(InlineQuery inlineQuery)
