@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Algorand;
 using GretaFoodCore.Api.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +45,8 @@ namespace GretaFoodCore.Api.Controllers
             }
             restaurantEntity.Id = Guid.NewGuid().ToString();
             //TODO: Check if geotag exist
-            //TODO: Generate Algorand address
+            var algoAcc = new Account();
+            restaurantEntity.AlgorandAddress = algoAcc.Address.ToString();
 
             _gretaFoodDb.Restaurants.Add(restaurantEntity);
             await _gretaFoodDb.SaveChangesAsync();
