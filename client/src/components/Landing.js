@@ -56,6 +56,7 @@ class Landing extends React.Component {
           if (this.state.restaurants.results[i].id === id) {
               rest_info = this.state.restaurants.results[i];
           }
+
       }
 
       let saved_rest = {
@@ -76,10 +77,12 @@ class Landing extends React.Component {
       })
             .then(r => {
                 return r.json()
+              
             })
             .then(json => {
                 let id = json.id;
                 saved_rest.id = id;
+               
             })
       
             

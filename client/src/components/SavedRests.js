@@ -1,13 +1,13 @@
 import React from 'react';
 
 import SavedRest from './SavedRest';
+import AddFoodForm from './AddFoodForm';
 
 class SavedRests extends React.Component {
     constructor(){
         super();
         this.state = {
-            restaraunts: [],
-            restAndFood: []
+            restaraunts: []
         }
     }
     componentDidMount(){
@@ -15,22 +15,6 @@ class SavedRests extends React.Component {
             .then(r => r.json())
             .then(restaraunts => this.setState({restaraunts}))
     }
-
-    deleteProd = (id) => {
-        fetch("http://34.66.77.56/api/"+id, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: "POST"
-        })
-            .then(
-                fetch("http://34.66.77.56/api/Restaurants")
-                    .then(r => r.json())
-                    .then(restaraunts => this.setState({restaraunts}))
-            )
-    }
-
 
     render(){
 
@@ -48,10 +32,7 @@ class SavedRests extends React.Component {
                                 return (
                                     <SavedRest
                                         key={rest.id}
-                                        id={rest.id}
-                                        name={rest.name}
-                                        address={rest.address}
-                                        geoTag={rest.geoTag}
+                                        rest_info = {rest}
                                     />
                                 )
                         }
