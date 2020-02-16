@@ -15,32 +15,54 @@ class Landing extends React.Component {
     };
   }
 
-  // takeRest = () => {
-  //   let restName = document.getElementById("takeRest").value;
-  //   fetch("/Restaurants", {
+  takeRest = () => {
+    let restName = document.getElementById("restName").value;
+    fetch("http://34.66.77.56/api/Map/" + restName)
+        .then(r => r.json())
+        .then(restaurants => {
+            this.setState({
+                restaurants: restaurants,
+                callSent: true
+            })
+        })
+  }
 
-  //   })
-  // }
+  updateFood = () => {
+    let name = document.getElementById("foodName").value;
+    let time = document.getElementById("pickUpTime").value;
+    let image = document.getElementById("photo").value;
+    let restId = this.state.restaurants[0].id;
+
+    let food_info = {
+        name: name,
+        ImageUrl: image,
+        availableTime: time,
+        restaurantId: restId
+    }
+    fetch("http://34.66.77.56/api/Food", {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify( food_info )
+    })
+  }
 
   saveRest = (id) => {
       let rest_info = {};
-      for (let i = 0; i < this.state.restaurants.length; i++) {
-          if (this.state.restaurants[i].id === id) {
-              rest_info = this.state.restaurants[i];
+      for (let i = 0; i < this.state.restaurants.results.length; i++) {
+          if (this.state.restaurants.results[i].id === id) {
+              rest_info = this.state.restaurants.results[i];
           }
       }
 
       let saved_rest = {
-              name: rest_info.name,
-              address: rest_info.address,
-              geoTag: rest_info.geoTag,
+              name: rest_info.poi.name,
+              address: rest_info.address.freeformAddress,
+              geoTag: rest_info.position.lat + "," + rest_info.position.lon,
               id: rest_info.id
       }
-
-      this.setState({
-        restaurants: [saved_rest],
-        callSent: false
-      })
 
 
       fetch(`http://34.66.77.56/api/Restaurants`, {
@@ -49,8 +71,23 @@ class Landing extends React.Component {
               'Content-Type': 'application/json'
           },
           method: "POST",
-          body: JSON.stringify({ saved_rest })
+          body: JSON.stringify( saved_rest )
       })
+            .then(r => {
+                return r.json()
+            })
+            .then(json => {
+                let id = json.id;
+                saved_rest.id = id;
+            })
+      
+            
+
+    
+    this.setState({
+        restaurants: [saved_rest],
+        callSent: false
+    })
   }
 
   render() {
@@ -63,14 +100,15 @@ class Landing extends React.Component {
     } else if (this.state.restaurants !== 0 && this.state.callSent === true) {
       return (
         <div className="container">
-          {this.state.restaurants.map(r => {
+          {this.state.restaurants.results.map(r => {
                             return (
                                 <Restaurant
                                     key={r.id}
-                                    restName={r.restName}
-                                    address={r.address}
+                                    id = {r.id}
+                                    restName={r.poi.name}
+                                    address={r.address.freeformAddress}
                                     karmaScore={r.karmaScore}
-                                    geoTag={r.geoTag}
+                                    geoTag={r.position.lat + "," + r.position.lon}
                                     saveRest={()=> this.saveRest(r.id)}
                                 />
                             )
@@ -82,7 +120,7 @@ class Landing extends React.Component {
     } else if (this.state.restaurants.length === 1){
       return (
         <div>
-          <AddFoodForm />
+          <AddFoodForm updateFood={() => this.updateFood()}/>
         </div>
       )
     }

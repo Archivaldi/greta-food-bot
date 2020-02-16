@@ -3,7 +3,7 @@ import { Route, BrowserRouter } from "react-router-dom";
 
 import Header from './components/Header';
 import Landing from "./components/Landing";
-import SavedRest from "./components/SavedRest";
+import SavedRests from "./components/SavedRests";
 import Footer from "./components/Footer"
 
 const App = () =>
@@ -14,7 +14,7 @@ const App = () =>
         <div className="container">
           <Header />
           <Route exact path="/" component={Landing} />
-          <Route exact path="/savedRestaurants" component={SavedRest} />
+          <Route exact path="/savedRestaurants" component={SavedRests} />
           <Footer />
         </div>
       </BrowserRouter>

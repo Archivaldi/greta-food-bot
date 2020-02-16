@@ -13,9 +13,9 @@ const Restaurant = (props) => {
                                 <p className="right">{props.karmaScore}</p>
                             </div>
                             <div className="card-action">
-                                <p> ${props.geoTag} </p>
+                                <p> {props.geoTag} </p>
                                 <p>
-                                    <button onClick={props.saveRest} style={{ backgroundColor: "#1387ff", display: "inline-block" }} className="btn-floating btn-large waves-effect waves-light right">Delete</button>
+                                    <button onClick={props.saveRest} style={{ backgroundColor: "#1387ff", display: "inline-block" }} className="btn-floating btn-large waves-effect waves-light right">Save</button>
                                 </p>
                             </div>
                         </div>
