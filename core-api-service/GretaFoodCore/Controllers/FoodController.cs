@@ -30,6 +30,7 @@ namespace GretaFoodCore.Api.Controllers
                     geo = f.Restaurant.GeoTag,
                     restaurantName = f.Restaurant.Name,
                     availableTime = f.AvailableTime,
+                    imageUrl = f.ImageUrl
                 })
                 .ToList();
             return result;
